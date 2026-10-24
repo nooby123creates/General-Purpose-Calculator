@@ -1,0 +1,421 @@
+Since I have no rights reserved and I don't want to give you a hard time, here's the code:
+
+# Importing necessary modules
+import tkinter as tk
+import math
+import random
+
+# Styles
+backgroundAndText, widgetbg, mainFont = "lightgray", "black", "Arial"
+reliefHeading, reliefBody = "ridge", "groove"
+
+# Creating the window
+root = tk.Tk()
+root.title("General-Purpose Calculator")
+root.geometry("850x450")
+root.configure(bg=backgroundAndText)
+
+# Basic arithmetic window
+def calculator():
+    # Gets all the style variables to use
+    global backgroundAndText, widgetbg, mainFont
+
+    approvedCharacters = ["+", "-", "/", "*", " ",
+                          "1", "2", "3", "4", "5",
+                          "6", "7", "8", "9", "0",
+                          "(", ")", "."]
+
+    # Makes the arithmetic window
+    calculator = tk.Toplevel()
+    calculator.title("Arithmetic")
+    calculator.geometry("1000x500")
+    calculator.configure(bg=backgroundAndText)
+
+    # Entry for the mathematical problem
+    problem = tk.Entry(calculator, bg=widgetbg, font=(mainFont, 20), fg=backgroundAndText)
+
+    # Function to solve the problem
+    def calc():
+        global backgroundAndText, widgetbg, mainFont
+        # Using try to avoid crashing the window
+        try:
+            # Check if the problem entry is empty
+            if not problem.get() == "":
+                for char in problem.get():
+                    if char not in approvedCharacters:
+                        problem.delete(0, tk.END)
+                        problem.insert(0,"Oops! You have been flagged as a possible hacker.")
+                        return
+                # Get the equation
+                equation = problem.get()
+                # Clear the entry
+                problem.delete(0, tk.END)
+                # Solve the equation
+                answered = eval(equation)
+                # Insert the answer
+                problem.insert(0, answered)
+            else:
+                problem.delete(0, tk.END)
+                problem.insert(0, "Please enter an equation")
+                return
+        # Inputs an error message instead of crashing the window
+        except Exception as Error:
+            problem.delete(0, tk.END)
+            problem.insert(0, "Error, try again")
+
+    # Binds the 'Enter' key to the solve command
+    calculator.bind("<Return>", lambda event: calc())
+
+    # Buttons for solving and clearing the entry
+    equal = tk.Button(calculator, text="=", command=calc, bg="orange", font=(mainFont, 20))
+    clear = tk.Button(calculator, text="C", command=lambda: problem.delete(0, tk.END), bg="orange", font=(mainFont, 20))
+
+    # List for all the buttons
+    numbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
+    operators = ["+", "-", "/", "*", "(", ")", "."]
+
+    # Placing the entry
+    problem.pack(pady=20, ipadx=20, ipady=10)
+
+    # Placing the special buttons
+    equal.pack(pady=20)
+    clear.pack(pady=20)
+
+    # Placing the numbered buttons
+    for nums in numbers:
+        numberB = tk.Button(calculator, text=nums, command=lambda number=nums: problem.insert(tk.END, number), font=(mainFont, 20), bg=widgetbg, fg=backgroundAndText)
+        numberB.pack(expand=True, side="left", padx=10)
+
+    # Placing the solving buttons
+    for operator in operators:
+        operatorB = tk.Button(calculator, text=operator, command=lambda opps=operator: problem.insert(tk.END, opps), font=(mainFont, 20), bg="orange")
+        operatorB.pack(expand=True, side="right", padx=10)
+
+# Conversion window
+def conversion():
+    # Gets all the style variables
+    global backgroundAndText, widgetbg, mainFont
+
+    # Makes the conversion window
+    converter = tk.Toplevel()
+    converter.title("Conversion")
+    converter.geometry("400x500")
+    converter.configure(bg=backgroundAndText)
+
+    # All the unit conversions
+    unitConv = ["in-cm", "cm-in", "ft-m", "m-ft",
+                "cm-m", "m-cm", "in-ft", "ft-in",
+                "km-mi", "mi-km", "cm-mm", "mm-cm",
+                "lb-kg", "kg-lb", "g-kg", "kg-g",
+                "mg-g", "g-mg", "°C-°F", "°F-°C",
+                "°C-K", "K-°C"]
+
+    # Input for a number to be converted
+    convertFromLabel = tk.Label(converter, text="Convert from:", bg=widgetbg, font=(mainFont, 14), fg=backgroundAndText, relief=reliefBody)
+    convertFrom = tk.Entry(converter, bg=widgetbg, font=(mainFont, 20), fg=backgroundAndText)
+
+    # Lets the user convert the number to a unit
+    convertToLabel = tk.Label(converter, text="Convert to:", bg=widgetbg, font=(mainFont, 14), fg=backgroundAndText, relief=reliefBody)
+    convertTo = tk.Listbox(converter, font=(mainFont, 14))
+
+    # Inserts the list of conversion methods
+    for unit1 in unitConv:
+        convertTo.insert(tk.END, unit1)
+
+    # Function for converting
+    def converting():
+        global backgroundAndText, widgetbg, mainFont
+
+        # Replaces the input
+        def replace(text):
+            global backgroundAndText, widgetbg, mainFont
+            convertFrom.delete(0, tk.END)
+            convertFrom.insert(0, text)
+
+        # Uses try to prevent the window from crashing
+        try:
+            # Getting the variables needed
+            selection = convertTo.curselection()
+            convMethod = convertTo.get(selection[0])
+            number = float(convertFrom.get())
+
+            # If statement to check each of the methods
+            if convMethod == "in-cm":
+                replace(number * 2.54)
+            elif convMethod == "cm-in":
+                replace(number / 2.54)
+            elif convMethod == "ft-m":
+                replace(number * 0.3048)
+            elif convMethod == "m-ft":
+                replace(number / 0.3048)
+            elif convMethod == "cm-m":
+                replace(number / 100)
+            elif convMethod == "m-cm":
+                replace(number * 100)
+            elif convMethod == "in-ft":
+                replace(number / 12)
+            elif convMethod == "ft-in":
+                replace(number * 12)
+            elif convMethod == "km-mi":
+                replace(number * 0.6214)
+            elif convMethod == "mi-km":
+                replace(number * 1.6093)
+            elif convMethod == "cm-mm":
+                replace(number * 10)
+            elif convMethod == "mm-cm":
+                replace(number / 10)
+            elif convMethod == "lb-kg":
+                replace(number / 2.20462262)
+            elif convMethod == "kg-lb":
+                replace(number * 2.20462262)
+            elif convMethod == "g-kg":
+                replace(number / 1000)
+            elif convMethod == "kg-g":
+                replace(number * 1000)
+            elif convMethod == "mg-g":
+                replace(number / 1000)
+            elif convMethod == "g-mg":
+                replace(number * 1000)
+            elif convMethod == "°C-°F":
+                replace(number * 1.8 + 32)
+            elif convMethod == "°F-°C":
+                replace((number - 32) / 1.8)
+            elif convMethod == "°C-K":
+                replace(number + 273.15)
+            elif convMethod == "K-°C":
+                replace(number - 273.15)
+
+        # Inputs an error
+        except Exception as e:
+            replace(f"Error: {e}")
+
+    # Binds the conversion function to the 'Enter' key
+    converter.bind("<Return>", lambda event: converting())
+
+    # Button to convert the number
+    convert = tk.Button(converter, text="Convert", bg=widgetbg, font=(mainFont, 20), command=converting, fg=backgroundAndText)
+
+    # Places all the widgets
+    convertFromLabel.pack(pady=10)
+    convertFrom.pack(pady=10)
+    convertToLabel.pack(pady=10)
+    convertTo.pack(pady=10)
+    convert.pack(pady=20)
+
+# Scientific window
+def scientific():
+    # Gets the style variables
+    global backgroundAndText, widgetbg, mainFont
+
+    # Makes the scientific window
+    science = tk.Toplevel()
+    science.title("Scientific calculator")
+    science.geometry("400x650")
+    science.configure(bg=backgroundAndText)
+
+    # List of all the functions
+    functions = ["sin(x)", "cos(x)", "square(x)", "squareRoot(x)",
+                 "log(x, y)", "tan(x)", "factorial(x)", "cubed(x)",
+                 "cubeRoot(x)", "nthRoot(x, y)", "nthPower(x)",
+                 "ceiling(x)", "floor(x)", "atan(x)", "acos(x)",
+                 "asin(x)", "abs(x)"]
+
+    # Lets the user input the x
+    xL = tk.Label(science, text="x:", bg=widgetbg, font=(mainFont, 14), fg=backgroundAndText, relief=reliefBody)
+    x = tk.Entry(science, font=(mainFont, 20), fg=backgroundAndText, bg=widgetbg)
+
+    # Lets the user input the y
+    yL = tk.Label(science, text="y:", bg=widgetbg, font=(mainFont, 14), fg=backgroundAndText, relief=reliefBody)
+    y = tk.Entry(science, font=(mainFont, 20), fg=backgroundAndText, bg=widgetbg)
+
+    # Lets the user input the function they need
+    funcL = tk.Label(science, text="function:", bg=widgetbg, font=(mainFont, 14), fg=backgroundAndText)
+    func = tk.Listbox(science, font=(mainFont, 14))
+
+    # Shows the answer
+    answer = tk.Label(science, text="Answer:", bg=widgetbg, font=(mainFont, 14), fg=backgroundAndText, relief=reliefBody)
+
+    # Inserts the functions
+    for functionn in functions:
+        func.insert(tk.END, functionn)
+
+    # Function to solve
+    def solveS():
+        global backgroundAndText, widgetbg, mainFont
+
+        # Function to change the answer widget
+        def replaceS(number):
+            answer.configure(text=f"Answer: {number}")
+
+        # Uses try to prevent crashes
+        try:
+            # Gets the variables needed
+            selectionS = func.curselection()
+            functionS = func.get(selectionS[0])
+
+            # Does not get the x or y if the entry is empty
+            if not x.get() == "":
+                numberS = float(x.get())
+            if not y.get() == "":
+                numberS2 = float(y.get())
+
+            # Checks if the function matches then solves
+            if functionS == functions[0]:
+                replaceS(math.sin(numberS))
+            elif functionS == functions[1]:
+                replaceS(math.cos(numberS))
+            elif functionS == functions[2]:
+                replaceS(numberS * numberS)
+            elif functionS == functions[3]:
+                replaceS(math.sqrt(numberS))
+            elif functionS == functions[4]:
+                replaceS(math.log(numberS, numberS2))
+            elif functionS == functions[5]:
+                replaceS(math.tan(numberS))
+            elif functionS == functions[6]:
+                replaceS(math.factorial(int(numberS)))
+            elif functionS == functions[7]:
+                replaceS(numberS * numberS * numberS)
+            elif functionS == functions[8]:
+                replaceS(math.cbrt(numberS))
+            elif functionS == functions[9]:
+                replaceS(numberS ** (1 / numberS2))
+            elif functionS == functions[10]:
+                replaceS(numberS ** numberS2)
+            elif functionS == functions[11]:
+                replaceS(math.ceil(numberS))
+            elif functionS == functions[12]:
+                replaceS(math.floor(numberS))
+            elif functionS == functions[13]:
+                replaceS(math.atan(numberS))
+            elif functionS == functions[14]:
+                replaceS(math.acos(numberS))
+            elif functionS == functions[15]:
+                replaceS(math.asin(numberS))
+            elif functionS == functions[16]:
+                replaceS(math.fabs(numberS))
+
+        # Inputs an error message instead of crashing
+        except Exception:
+            replaceS("Error! Try again.")
+
+    # Button to solve
+    solveB = tk.Button(science, text="Solve", bg=widgetbg, font=(mainFont, 14), command=solveS, fg=backgroundAndText)
+
+    # Places all of the widgets
+    xL.pack(pady=5)
+    x.pack(pady=10)
+    yL.pack(pady=5)
+    y.pack(pady=10)
+    funcL.pack(pady=10)
+    func.pack(pady=10)
+    solveB.pack(pady=20)
+    answer.pack(pady=10)
+
+# Percentage window
+def percentage():
+    # Gets the style variables
+    global backgroundAndText, widgetbg, mainFont
+
+    # To prevent errors from crashing the window
+    # Making the window
+    percentage = tk.Toplevel()
+    percentage.title("Percentage")
+    percentage.geometry("350x200")
+    percentage.configure(bg=backgroundAndText)
+    # The core inputs
+    percentNum = tk.Entry(percentage, bg=widgetbg, font=(mainFont, 14), fg=backgroundAndText)
+    of = tk.Label(percentage, text="% of:", bg=widgetbg, font=(mainFont, 14), relief=reliefBody, fg=backgroundAndText)
+    otherNum = tk.Entry(percentage, bg=widgetbg, font=(mainFont, 14), fg=backgroundAndText)
+
+    # Area where the answer pops up
+    answer = tk.Label(percentage, text="", bg=backgroundAndText, font=(mainFont, 14), fg="black")
+
+    # Function to calculate the given
+    def percentf():
+        try:
+            num1, num2 = float(percentNum.get()), float(otherNum.get())
+
+            calculated = (num1 / 100) * num2
+
+            answer.configure(text=f"Answer: {calculated}")
+        except Exception as e:
+                answer.configure(text=f"Error: {e}")
+
+    # Button to start the procedure
+    percent = tk.Button(percentage, text="Answer", bg=widgetbg, fg=backgroundAndText, command=percentf)
+
+    # Placing everything into the window
+    percentNum.pack(pady=5)
+    of.pack(pady=5)
+    otherNum.pack(pady=5)
+
+    answer.pack(pady=5)
+
+    percent.pack(pady=5)
+
+def randomGen():
+    # Importing necessary styles
+    global backgroundAndText, widgetbg, mainFont
+    
+    # Making the actual window
+    ran = tk.Toplevel()
+    ran.title("Random Number Generator")
+    ran.geometry("350x250")
+    ran.configure(bg=backgroundAndText)
+    
+    # Making the widgets
+    firstNum = tk.Entry(ran, bg=widgetbg, font=(mainFont, 14), fg=backgroundAndText)
+    to = tk.Label(ran, text="to", bg=widgetbg, font=(mainFont, 14), fg=backgroundAndText)
+    secondNum = tk.Entry(ran, bg=widgetbg, font=(mainFont, 14), fg=backgroundAndText)
+
+    generatedOutput = tk.Label(ran, text="", font=(mainFont, 14), bg=backgroundAndText)
+
+    # The function that makes a random number
+    def generateRandomNumber():
+        # Wrap around 'try' to prevent errors
+        try:
+            range1 = int(firstNum.get())
+            range2 = int(secondNum.get())
+
+            output = random.randint(range1, range2)
+
+            generatedOutput.configure(text= f"Generated number: {output}")
+        except Exception as e:
+            generatedOutput.configure(text=f"Error: {e}")
+    
+    # Button to call the function
+    generateB = tk.Button(ran, text="Generate number", font=(mainFont, 14), bg=backgroundAndText, command=generateRandomNumber)
+
+    # Placing the widgets
+    firstNum.pack(pady=5)
+    to.pack(pady=5)
+    secondNum.pack(pady=5)
+
+    generatedOutput.pack(pady=10)
+
+    generateB.pack(pady=5)
+
+# Title of the app
+welcome = tk.Label(root, text="General-purpose Calculator", bg=widgetbg, font=(mainFont, 50), relief=reliefHeading, fg=backgroundAndText)
+
+intro = tk.Label(root, text="What do you want to do today?", bg=widgetbg, font=(mainFont, 20), fg=backgroundAndText, relief=reliefBody)
+
+# Buttons to go to each window
+normalCalculator = tk.Button(root, text="     Arithmetic     ", font=(mainFont, 14), bg=widgetbg, command=calculator, fg=backgroundAndText)
+unitConversion = tk.Button(root, text="     Unit conversion     ", font=(mainFont, 14), bg=widgetbg, command=conversion, fg=backgroundAndText)
+scienceCalculator = tk.Button(root, text="     Scientific calculator     ", font=(mainFont, 14), bg=widgetbg, command=scientific, fg=backgroundAndText)
+percentageCalculator = tk.Button(root, text="     Percentage calculator     ", font=(mainFont, 14), bg=widgetbg, command=percentage, fg=backgroundAndText)
+randomGenerator = tk.Button(root, text="     Random Number Generator     ", font=(mainFont, 14), bg=widgetbg, command=randomGen, fg=backgroundAndText)
+
+# Placing each widget
+welcome.pack(pady=20)
+intro.pack(pady=10)
+normalCalculator.pack(pady=5)
+unitConversion.pack(pady=5)
+scienceCalculator.pack(pady=5)
+percentageCalculator.pack(pady=5)
+randomGenerator.pack(pady=5)
+
+# Letting the page run
+root.mainloop()
